@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasteignirApi", "FasteignirApi\FasteignirApi.csproj", "{483AD1CA-D80D-41AD-A7C3-46C606675F86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FasteignirCommon", "FasteignirCommon\FasteignirCommon.csproj", "{2C510E7A-C402-43A9-BB9E-1F6286204F37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmsSync", "HmsSync\HmsSync.csproj", "{0D5E1BA7-D84E-42F0-A97D-317BA2935A4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{483AD1CA-D80D-41AD-A7C3-46C606675F86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{483AD1CA-D80D-41AD-A7C3-46C606675F86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{483AD1CA-D80D-41AD-A7C3-46C606675F86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{483AD1CA-D80D-41AD-A7C3-46C606675F86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C510E7A-C402-43A9-BB9E-1F6286204F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C510E7A-C402-43A9-BB9E-1F6286204F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C510E7A-C402-43A9-BB9E-1F6286204F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C510E7A-C402-43A9-BB9E-1F6286204F37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D5E1BA7-D84E-42F0-A97D-317BA2935A4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5E1BA7-D84E-42F0-A97D-317BA2935A4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5E1BA7-D84E-42F0-A97D-317BA2935A4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5E1BA7-D84E-42F0-A97D-317BA2935A4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

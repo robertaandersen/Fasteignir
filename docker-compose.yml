@@ -1,0 +1,26 @@
+version: '3.2'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    volumes:
+      - fasteignirdb:/var/lib/postgresql/data
+      - ./DockerInfra/PostgresDb/SqlScripts/:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_USER=fasteignaskra
+      - POSTGRES_PASSWORD=fasteignaskra
+    ports:
+      - "5432:5432"
+    restart: always
+
+  fasteignirapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.FasteignirApi
+    environment:
+      - ConnectionStrings__db=Host=postgres;Username=admin;Password=admin;Database=admin
+    ports:
+      - 5063:80
+
+volumes:
+  fasteignirdb:
