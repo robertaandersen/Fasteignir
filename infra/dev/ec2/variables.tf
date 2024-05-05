@@ -6,6 +6,10 @@ variable "vpc_id" {
   description = "The ID of the VPC where the resources will be provisioned."
   type        = string
 }
+variable "target_group_arn" {
+  description = "The arn of the target group for the resources."
+  type        = string
+}
 
 variable "subnets" {
   description = "The IDs of the Subnets where the resources will be provisioned."
