@@ -16,10 +16,19 @@ module "vpc" {
 }
 
 module "ec2" {
-  source            = "./ec2"
+  source      = "./ec2"
+  region      = local.region
+  vpc_id      = module.vpc.vpc_id
+  jumpbox_key = local.jumpbox_key
+  subnets     = module.vpc.public_subnets
+}
+
+module "external-alb" {
+  source            = "./external-alb"
+  alb_name          = "external-alb"
   region            = local.region
   vpc_id            = module.vpc.vpc_id
-  security_group_id = module.vpc.allow_ssh_sg_security_group_id
-  jumpbox_key       = local.jumpbox_key
-  subnets           = module.vpc.public_subnets
+  subnets           = module.vpc.public_subnets.*.id
+  security_group_id = module.ec2.http_security_group_id
+  ec2_instance_ids  = module.ec2.ec2_instance_ids
 }

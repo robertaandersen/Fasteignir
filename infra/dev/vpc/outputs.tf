@@ -7,7 +7,4 @@ output "public_subnets" {
 output "private_subnets" {
   value = module.vpc.private_subnets
 }
-output "allow_ssh_sg_security_group_id" {
-  value = module.vpc.allow_ssh_sg_security_group_id
-}
 

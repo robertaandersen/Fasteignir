@@ -21,8 +21,8 @@ variable "vpc_id" {
   type = string
 
 }
-variable "security_group_id" {
-  type = string
+variable "security_group_ids" {
+  type = list(string)
 
 }
 
@@ -41,5 +41,4 @@ variable "user_data" {
   description = "The user data to provide to the EC2 instance."
   type        = string
   default     = ""
-
 }
