@@ -7,4 +7,5 @@ module "alb" {
   name               = var.alb_name
   internal           = false
   load_balancer_type = "application"
+  target_type        = "ip"
 }

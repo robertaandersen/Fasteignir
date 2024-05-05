@@ -36,5 +36,12 @@ variable "vpc_id" {
 variable "ec2_instance_ids" {
   description = "The list of EC2 instance IDs"
   type        = list(string)
+  default     = null
+}
+
+variable "target_type" {
+  description = "The type of target"
+  type        = string
+  default     = "instance"
 
 }

@@ -9,10 +9,11 @@ resource "aws_lb" "main" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name     = "${var.name}-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "${var.name}-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = var.target_type
 
   health_check {
     enabled             = true
@@ -27,7 +28,7 @@ resource "aws_lb_target_group" "target_group" {
 }
 
 resource "aws_lb_target_group_attachment" "tg_attachments" {
-  for_each         = toset(var.ec2_instance_ids)
+  for_each         = var.ec2_instance_ids != null ? toset(var.ec2_instance_ids) : []
   target_group_arn = aws_lb_target_group.target_group.arn
   target_id        = each.value
   port             = 80
