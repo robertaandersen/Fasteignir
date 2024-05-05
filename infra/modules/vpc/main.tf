@@ -37,10 +37,11 @@ resource "aws_subnet" "private_subnets" {
   }
 }
 resource "aws_subnet" "public_subnets" {
-  count             = length(local.exposed_subnets)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = local.exposed_subnets[count.index].cidr_range
-  availability_zone = local.exposed_subnets[count.index].az
+  count                   = length(local.exposed_subnets)
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = local.exposed_subnets[count.index].cidr_range
+  availability_zone       = local.exposed_subnets[count.index].az
+  map_public_ip_on_launch = true
 
   tags = {
     Name = "Subnet-${local.exposed_subnets[count.index].az}-${local.exposed_subnets[count.index].tag}"
@@ -75,4 +76,44 @@ resource "aws_route_table_association" "public_subnet_associations" {
   count          = length(aws_subnet.public_subnets)
   subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.route_table[count.index].id
+}
+
+
+resource "aws_security_group" "allow_ssh_sg" {
+  name        = "allow_ssh"
+  description = "Allow SSH inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "HTTP from Home"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["89.17.152.11/32"]
+  }
+  ingress {
+    description = "SSH from Home"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["89.17.152.11/32"]
+  }
+  ingress {
+    description = "Instance Connect"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["18.202.216.48/29"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.vpc_name}-sg"
+  }
 }

@@ -24,3 +24,7 @@ dev/vpc/.terraform/*
 
 # Ignore log files
 crash.log
+
+.envrc.private
+
+**jumpbox-key.pem

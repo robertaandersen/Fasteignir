@@ -1,14 +1,5 @@
-terraform {
-  backend "s3" {
-    bucket  = "6bc7db9b3321-tfstate"
-    key     = "vpc/terraform.tfstate"
-    region  = "eu-west-1"
-    encrypt = true
-  }
-}
-
 locals {
-  region = "eu-west-1"
+  region = var.region
   web_subnets = [
     { cidr_range = "10.16.1.0/24", az = "eu-west-1a", tag = "web", exposed = true },
     { cidr_range = "10.16.2.0/24", az = "eu-west-1b", tag = "web", exposed = true },
@@ -26,8 +17,6 @@ locals {
   ]
 }
 
-
-
 module "vpc" {
   source         = "../../modules/vpc"
   vpc_name       = "main_vpc"
@@ -35,7 +24,3 @@ module "vpc" {
   region         = local.region
   subnets        = concat(local.web_subnets, local.backend_subnets, local.rds_subnets)
 }
-
-# resource "aws_route_table" "main_route_table" {
-#     vpc_id = module.vpc.vpc_id
-# }
