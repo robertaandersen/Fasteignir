@@ -12,6 +12,10 @@ variable "security_group_ids" {
   type        = set(string)
   description = "The list of security groups to attach to the ECS instances"
 }
+variable "alb_name" {
+  type        = string
+  description = "Name of alb"
+}
 
 
 variable "task_settings" {

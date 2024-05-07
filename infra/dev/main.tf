@@ -47,3 +47,15 @@ resource "aws_ecr_repository" "ecr" {
     scan_on_push = true
   }
 }
+
+
+
+# resource "aws_ecs_task_definition" "ecs_task_definition" {
+#   family = "temp"
+#   container_definitions = null
+# }
+
+# import {
+#   to = aws_ecs_task_definition.ecs_task_definition
+#   id = "arn:aws:ecs:eu-west-1:992382615085:task-definition/temp"
+# }

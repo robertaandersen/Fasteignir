@@ -3,6 +3,9 @@ resource "aws_ecs_cluster" "cluster" {
   name = var.cluster_name
 }
 
+data "aws_lb_target_group" "target_group_ip" {
+  name = "${var.alb_name}-ip-tg"
+}
 
 resource "aws_ecs_cluster_capacity_providers" "capacity_provider" {
   cluster_name = aws_ecs_cluster.cluster.name
@@ -57,5 +60,11 @@ resource "aws_ecs_service" "service" {
     security_groups = var.security_group_ids
     assign_public_ip = var.task_settings.assign_public_ip
   }
+
+  load_balancer {
+   target_group_arn = data.aws_lb_target_group.target_group_ip.arn
+   container_name   = var.task_settings.container.name
+   container_port   = 80
+ }
 
 }
