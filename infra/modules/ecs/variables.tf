@@ -20,10 +20,10 @@ variable "alb_name" {
 
 variable "task_settings" {
   type = object({
-    cpu          = number
-    network_mode = string
-    memory       = number
-    desired_count = number
+    cpu              = number
+    network_mode     = string
+    memory           = number
+    desired_count    = number
     assign_public_ip = bool
     container = object({
       name     = string

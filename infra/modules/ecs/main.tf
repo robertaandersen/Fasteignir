@@ -56,15 +56,14 @@ resource "aws_ecs_service" "service" {
   desired_count   = var.task_settings.desired_count
   launch_type     = "FARGATE"
   network_configuration {
-    subnets         = var.subnet_ids
-    security_groups = var.security_group_ids
+    subnets          = var.subnet_ids
+    security_groups  = var.security_group_ids
     assign_public_ip = var.task_settings.assign_public_ip
   }
 
   load_balancer {
-   target_group_arn = data.aws_lb_target_group.target_group_ip.arn
-   container_name   = var.task_settings.container.name
-   container_port   = 80
- }
-
+    target_group_arn = data.aws_lb_target_group.target_group_ip.arn
+    container_name   = var.task_settings.container.name
+    container_port   = 8080
+  }
 }

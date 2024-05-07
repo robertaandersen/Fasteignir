@@ -46,19 +46,19 @@ module "frontend-cluster" {
   cluster_name       = "frontend-cluster"
   subnet_ids         = var.subnet_ids
   security_group_ids = [data.aws_security_group.allow_http.id]
-  alb_name = var.alb_name
+  alb_name           = var.alb_name
   task_settings = {
-    network_mode = "awsvpc"
-    cpu          = 1024
-    memory       = 3072
-    desired_count = 1
+    network_mode     = "awsvpc"
+    cpu              = 1024
+    memory           = 3072
+    desired_count    = 1
     assign_public_ip = true
     container = {
-      name     = "fasteignir"
-      image    = "992382615085.dkr.ecr.eu-west-1.amazonaws.com/fasteignir-backend:latest"
+      name  = "fasteignir"
+      image = "992382615085.dkr.ecr.eu-west-1.amazonaws.com/fasteignir-backend:latest"
       # image    = "nginx:latest"
-      port     = 80
-      hostPort = 80
+      port     = 8080
+      hostPort = 8080
     }
   }
 }
