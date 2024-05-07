@@ -41,35 +41,48 @@ data "aws_security_group" "allow_http" {
 # }
 
 
-module "cluster" {
+module "frontend-cluster" {
   source             = "../../modules/ecs"
-  cluster_name       = "backend-cluster"
+  cluster_name       = "frontend-cluster"
   subnet_ids         = var.subnet_ids
   security_group_ids = [data.aws_security_group.allow_http.id]
+  task_settings = {
+    network_mode = "awsvpc"
+    cpu          = 1024
+    memory       = 3072
+    desired_count = 1
+    assign_public_ip = true
+    container = {
+      name     = "nginx"
+      image    = "nginx"
+      port     = 80
+      hostPort = 80
+    }
+  }
 }
 
 
 
 
-resource "tls_private_key" "ec2_key_pair" {
-  count     = local.create_ec2 ? 1 : 0
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
+# resource "tls_private_key" "ec2_key_pair" {
+#   count     = local.create_ec2 ? 1 : 0
+#   algorithm = "RSA"
+#   rsa_bits  = 4096
+# }
 
-resource "local_file" "tf_key" {
-  count    = local.create_ec2 ? 1 : 0
-  content  = tls_private_key.ec2_key_pair[0].private_key_pem
-  filename = "${var.jumpbox_key}.pem"
-}
+# resource "local_file" "tf_key" {
+#   count    = local.create_ec2 ? 1 : 0
+#   content  = tls_private_key.ec2_key_pair[0].private_key_pem
+#   filename = "${var.jumpbox_key}.pem"
+# }
 
-resource "aws_key_pair" "generated_key" {
-  count      = local.create_ec2 ? 1 : 0
-  key_name   = var.jumpbox_key
-  public_key = tls_private_key.ec2_key_pair[0].public_key_openssh
-}
+# resource "aws_key_pair" "generated_key" {
+#   count      = local.create_ec2 ? 1 : 0
+#   key_name   = var.jumpbox_key
+#   public_key = tls_private_key.ec2_key_pair[0].public_key_openssh
+# }
 
-output "debug" {
-  value = "module.ec2.debug"
-}
+# output "debug" {
+#   value = "module.ec2.debug"
+# }
 

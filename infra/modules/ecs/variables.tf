@@ -19,6 +19,8 @@ variable "task_settings" {
     cpu          = number
     network_mode = string
     memory       = number
+    desired_count = number
+    assign_public_ip = bool
     container = object({
       name     = string
       image    = string
@@ -27,17 +29,4 @@ variable "task_settings" {
     })
   })
   description = "The settings for the ECS task"
-  default = {
-    network_mode = "awsvpc"
-    cpu          = 1024
-    memory       = 3072
-    container = {
-      name     = "nginx"
-      image    = "nginx"
-      port     = 80
-      hostPort = 80
-    }
-  }
-
 }
-
