@@ -21,24 +21,24 @@ data "aws_security_group" "allow_http" {
 }
 
 
-module "ec2" {
-  source     = "../../modules/ec2"
-  region     = var.region
-  name       = "DEV EC2 Jumpboxes and demo instances"
-  subnet_ids = var.subnet_ids
-  vpc_id     = var.vpc_id
-  # ec2_instances      = local.create_ec2 ? local.ecs2_in_each_subnet : null
-  launch_template = {
-    name               = "ec2-launch-template"
-    subnet_ids         = var.subnet_ids
-    public_ip          = false
-    key_name           = var.jumpbox_key
-    min_size           = 1
-    max_size           = 1
-    desired_capacity   = 1
-    security_group_ids = [data.aws_security_group.allow_http.id]
-  }
-}
+# module "ec2" {
+#   source     = "../../modules/ec2"
+#   region     = var.region
+#   name       = "DEV EC2 Jumpboxes and demo instances"
+#   subnet_ids = var.subnet_ids
+#   vpc_id     = var.vpc_id
+#   # ec2_instances      = local.create_ec2 ? local.ecs2_in_each_subnet : null
+#   launch_template = {
+#     name               = "ec2-launch-template"
+#     subnet_ids         = var.subnet_ids
+#     public_ip          = false
+#     key_name           = var.jumpbox_key
+#     min_size           = 1
+#     max_size           = 1
+#     desired_capacity   = 1
+#     security_group_ids = [data.aws_security_group.allow_http.id]
+#   }
+# }
 
 
 module "cluster" {
