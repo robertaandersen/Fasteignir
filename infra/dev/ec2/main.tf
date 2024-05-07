@@ -1,135 +1,103 @@
-locals {
-  user_data = <<EOF
-    #! /bin/bash
-    sudo yum install httpd -y
-    sudo systemctl start httpd
-    sudo systemctl enable httpd
-    sudo usermod -a -G apache ec2-user
-    sudo chown -R ec2-user:apache /var/www
-    sudo chmod 2775 /var/www
-    find /var/www -type d -exec sudo chmod 2775 {} \;
-    find /var/www -type f -exec sudo chmod 0664 {} \;
-    export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-    sudo echo "<h1>Hallo from autoscaled-instance $INSTANCE_ID</h1>" >/var/www/html/index.html
-  EOF
-}
-data "aws_ami" "ami" {
-  most_recent = true
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
 
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-  filter {
-    name   = "name"
-    values = ["amzn2-ami*"]
-  }
-  owners = ["amazon"]
+
+locals {
+  create_ec2 = false
+  ecs2_in_each_subnet = [for subnet in var.subnet_ids : {
+    subnet_id = subnet,
+    name = "Autoscaled EC2 instance in subnet ${subnet}",
+    key_name = var.jumpbox_key,
+    public_ip = true,
+    security_group_ids = [ data.aws_security_group.allow_http.id]
+    }
+  ]
 }
+
+data aws_security_group allow_ssh_sg {
+  name = "Allow ssh"
+}
+
+data aws_security_group allow_http {
+  name = "Allow HTTP"
+}
+
+
+module "ec2" {
+  source             = "../../modules/ec2"
+  region             = var.region
+  name               = "DEV EC2 Jumpboxes and demo instances"
+  subnet_ids         = var.subnet_ids
+  vpc_id             = var.vpc_id
+  # ec2_instances      = local.create_ec2 ? local.ecs2_in_each_subnet : null
+  launch_template    = {
+    name = "ec2-launch-template"
+    subnet_ids = var.subnet_ids
+    public_ip = true
+    key_name = var.jumpbox_key
+    min_size = 1
+    max_size = 1
+    desired_capacity = 1
+    security_group_ids = [ data.aws_security_group.allow_http.id]
+  }
+}
+
+
 
 resource "tls_private_key" "ec2_key_pair" {
-  count     = var.jumpbox_key != "" ? 1 : 0
+  count = local.create_ec2 ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "local_file" "tf_key" {
-  count    = var.jumpbox_key != "" ? 1 : 0
+  count = local.create_ec2 ? 1 : 0
   content  = tls_private_key.ec2_key_pair[0].private_key_pem
   filename = "${var.jumpbox_key}.pem"
-
 }
 
 resource "aws_key_pair" "generated_key" {
-  count      = var.jumpbox_key != "" ? 1 : 0
+  count = local.create_ec2 ? 1 : 0
   key_name   = var.jumpbox_key
   public_key = tls_private_key.ec2_key_pair[0].public_key_openssh
 }
 
-resource "aws_security_group" "allow_http" {
-  name        = "Allow HTTP"
-  description = "Allow HTTP inbound traffic"
-  vpc_id      = var.vpc_id
-  ingress {
-    description = "HTTP from Anywhere"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "HTTPS from Anywhere"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-resource "aws_security_group" "allow_ssh_sg" {
-  name        = "Allow ssh"
-  description = "Allow SSH inbound traffic"
-  vpc_id      = var.vpc_id
-  ingress {
-    description = "SSH from Home"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["89.17.152.11/32"]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+output "debug" {
+  value = "module.ec2.debug"
 }
 
 
-resource "aws_launch_template" "ec2" {
-  name_prefix                          = "ec2-auto-scaling"
-  image_id                             = data.aws_ami.ami.id
-  instance_type                        = "t2.micro"
-  key_name                             = var.jumpbox_key != "" ? var.jumpbox_key : null
-  instance_initiated_shutdown_behavior = "terminate"
-  vpc_security_group_ids               = [aws_security_group.allow_http.id, aws_security_group.allow_ssh_sg.id]
-  user_data                            = base64encode(local.user_data)
 
+# # resource "aws_lb_target_group" "target_group" {
+# #   name        = "${var.alb_name}-tg"
+# #   port        = 80
+# #   protocol    = "HTTP"
+# #   vpc_id      = var.vpc_id
+# #   target_type = "instance"
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+# #   health_check {
+# #     enabled             = true
+# #     port                = 80
+# #     interval            = 30
+# #     path                = "/"
+# #     timeout             = 5
+# #     healthy_threshold   = 2
+# #     unhealthy_threshold = 2
+# #     matcher             = "200"
+# #   }
+# # }
 
+# # resource "aws_lb_target_group_attachment" "tg_attachments" {
+# #   target_group_arn = aws_lb_target_group.target_group.arn
+# #   target_id        = each.value
+# #   port             = 80
+# # }
 
-resource "aws_autoscaling_group" "frontent" {
-  name                = "frontend-asg"
-  min_size            = 2
-  max_size            = 2
-  desired_capacity    = 2
-  vpc_zone_identifier = toset(var.subnets.*.id)
-  target_group_arns   = [var.target_group_arn]
-  launch_template {
-    id      = aws_launch_template.ec2.id
-    version = "$Latest"
+# # resource "aws_lb_listener" "lb_port_80_listener" {
+# #   load_balancer_arn = aws_lb.main.arn
+# #   port              = "80"
+# #   protocol          = "HTTP"
 
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tag {
-    key                 = "Name"
-    value               = "app-instance"
-    propagate_at_launch = true
-  }
-}
+# #   default_action {
+# #     type             = "forward"
+# #     target_group_arn = aws_lb_target_group.target_group.arn
+# #   }
+# # }

@@ -7,36 +7,40 @@ terraform {
   }
 }
 locals {
-  region          = "eu-west-1"
-  jumpbox_key     = "jumpbox-key"
-  backend_subnets = compact(toset([for each in module.vpc.private_subnets : each.tags["type"] == "backend" ? each.id : null]))
+  region      = "eu-west-1"
+  jumpbox_key = "jumpbox-key"
+  alb_name          = "external-alb"
 }
-module "vpc" {
-  source = "./vpc"
+module "networking" {
+  source = "./networking"
   region = local.region
 }
 
+
 module "ec2" {
-  source           = "./ec2"
-  region           = local.region
-  vpc_id           = module.vpc.vpc_id
-  jumpbox_key      = local.jumpbox_key
-  subnets          = module.vpc.public_subnets
-  target_group_arn = module.external-alb.target_group_arn
+  source             = "./ec2"
+  region             = local.region
+  vpc_id             = module.networking.vpc_id
+  jumpbox_key        = local.jumpbox_key
+  alb_name = local.alb_name
+  subnet_ids         = [module.networking.public_subnets[0].id]
+}
+
+output "debug" {
+  value = module.ec2.debug
 }
 
 module "external-alb" {
   source            = "./external-alb"
-  alb_name          = "external-alb"
+  alb_name          = local.alb_name
   region            = local.region
-  vpc_id            = module.vpc.vpc_id
-  subnets           = module.vpc.public_subnets.*.id
-  security_group_id = module.ec2.http_security_group_id
+  vpc_id            = module.networking.vpc_id
+  subnets           = module.networking.public_subnets.*.id
 }
 
 # module "ecs_backend_cluster" {
 #   source             = "./ecs"
-#   subnets            = local.backend_subnets
+#   subnets            = local.public_subnets
 #   security_group_ids = [module.ec2.http_security_group_id]
 # }
 

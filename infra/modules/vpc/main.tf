@@ -11,9 +11,14 @@ provider "aws" {
 }
 
 locals {
-  exposed_subnets = [for subnet in var.subnets : subnet if subnet.exposed == true]
-  private_subnets = [for subnet in var.subnets : subnet if subnet.exposed == false]
+  backend_subnets = toset([for each in aws_subnet.subnets : each if each.tags["type"] == "backend"])
+  public_subnets  = [for each in aws_subnet.subnets : each if each.tags["type"] == "web"]
+  rds_subnets     = toset([for each in aws_subnet.subnets : each if each.tags["type"] == "rds"])
 }
+
+# output "debug" {
+#   value = local.route_tables_by_subnet_id["subnet-0c9f38a12c16153c9"]
+# }
 
 resource "aws_vpc" "main" {
   cidr_block                       = var.vpc_cidr_block
@@ -26,26 +31,17 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "private_subnets" {
-  count             = length(local.private_subnets)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = local.private_subnets[count.index].cidr_range
-  availability_zone = local.private_subnets[count.index].az
 
-  tags = {
-    Name = "Subnet-${local.private_subnets[count.index].az}-${local.private_subnets[count.index].tag}"
-    type = local.private_subnets[count.index].tag
-  }
-}
-resource "aws_subnet" "public_subnets" {
-  count                   = length(local.exposed_subnets)
+resource "aws_subnet" "subnets" {
+  count                   = length(var.cidr_blocks)
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = local.exposed_subnets[count.index].cidr_range
-  availability_zone       = local.exposed_subnets[count.index].az
-  map_public_ip_on_launch = true
+  cidr_block              = var.cidr_blocks[count.index].cidr_range
+  availability_zone       = var.cidr_blocks[count.index].az
+  map_public_ip_on_launch = var.cidr_blocks[count.index].exposed == true
 
   tags = {
-    Name = "Subnet-${local.exposed_subnets[count.index].az}-${local.exposed_subnets[count.index].tag}"
+    Name = "Subnet-${var.cidr_blocks[count.index].az}-${var.cidr_blocks[count.index].tag}"
+    type = var.cidr_blocks[count.index].tag
   }
 }
 
@@ -60,21 +56,22 @@ resource "aws_internet_gateway" "gw" {
 }
 
 
-resource "aws_route_table" "route_table" {
-  count  = length(aws_subnet.public_subnets)
+resource "aws_route_table" "public_route_tables" {
+  count  = length(local.public_subnets)
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw[0].id
   }
   tags = {
-    Name = "${var.vpc_name}-${aws_subnet.public_subnets[count.index].availability_zone}-${aws_subnet.public_subnets[count.index].tags["Name"]}-rt"
-    az   = local.exposed_subnets[count.index].az
+    Name      = "${var.vpc_name}-${local.public_subnets[count.index].availability_zone}-rt"
+    subnet_id = local.public_subnets[count.index].id
   }
 }
 
+# Associate public subnets with public a public route table
 resource "aws_route_table_association" "public_subnet_associations" {
-  count          = length(aws_subnet.public_subnets)
-  subnet_id      = aws_subnet.public_subnets[count.index].id
-  route_table_id = aws_route_table.route_table[count.index].id
+  count          = length(aws_route_table.public_route_tables)
+  subnet_id      = aws_route_table.public_route_tables[count.index].tags["subnet_id"]
+  route_table_id = aws_route_table.public_route_tables[count.index].id
 }

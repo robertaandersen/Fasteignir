@@ -1,15 +1,53 @@
+# Metadata
 variable "region" {
   description = "The AWS region where the EC2 instance will be launched"
   type        = string
 }
-
-variable "subnet_id" {
-  description = "The ID of the subnet where the EC2 instance will be launched"
-  type        = string
-}
-
 variable "name" {
   type = string
+}
+
+#### Network variables
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnet_ids" {
+  description = "The ID of the subnet where the EC2 instance will be launched"
+  type        = list(string)
+}
+
+variable "alb_name" {
+  description = "The name of the Application Load Balancer."
+  type        = string
+  default     = ""
+
+}
+
+### Config
+variable "ec2_instances" {
+  type = list(object({
+    name      = string
+    subnet_id   = string
+    public_ip = bool
+    key_name = string
+    security_group_ids = list(string)
+  }))
+  default = null
+}
+
+variable "launch_template" {
+  type = object({
+    name      = string
+    # subnet_ids   = list(string)
+    # public_ip = bool
+    # key_name = string
+    security_group_ids = list(string)
+    min_size            = number
+    max_size            = number
+    desired_capacity    = number
+  })
+  default = null
 }
 
 variable "instance_type" {
@@ -17,28 +55,14 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
-variable "vpc_id" {
-  type = string
-
-}
-variable "security_group_ids" {
-  type = list(string)
-
-}
-
-variable "ami" {
-  description = "The ID of the AMI to use for the EC2 instance."
-  type        = string
-}
-
-variable "jumpbox_key" {
-  description = "The name of the key pair to use for the jumpbox."
-  type        = string
-  default     = ""
-}
-
-variable "user_data" {
-  description = "The user data to provide to the EC2 instance."
-  type        = string
-  default     = ""
-}
+# variable "autoscaling_group" {
+#   description = "The Autoscaling group."
+#   type = object({
+#     name                = string
+#     min_size            = number
+#     max_size            = number
+#     desired_capacity    = number
+#     vpc_zone_identifier = list(string)
+#   })
+#   default = null
+# }

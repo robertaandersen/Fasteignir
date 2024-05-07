@@ -18,7 +18,7 @@ variable "vpc_cidr_block" {
   default     = "10.16.0.0/16"
 }
 
-variable "subnets" {
+variable "cidr_blocks" {
   description = "List of CIDR blocks for each subnet."
   type = list(object({
     cidr_range = string
