@@ -37,3 +37,13 @@ module "external-alb" {
   vpc_id   = module.networking.vpc_id
   subnets  = module.networking.public_subnets.*.id
 }
+
+
+resource "aws_ecr_repository" "ecr" {
+  name                 = "fasteignir-backend"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}

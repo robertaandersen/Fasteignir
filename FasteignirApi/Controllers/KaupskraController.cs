@@ -12,7 +12,6 @@ namespace FasteignirApi.Controllers
 
         public KaupskraController(KaupskraService kaupskraService) => this.kaupskraService = kaupskraService;
 
-
         [HttpGet]
         public ActionResult<List<Kaupskra>> Get(
             string? name,
