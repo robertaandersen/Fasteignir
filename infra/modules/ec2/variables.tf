@@ -27,10 +27,10 @@ variable "alb_name" {
 ### Config
 variable "ec2_instances" {
   type = list(object({
-    name      = string
-    subnet_id   = string
-    public_ip = bool
-    key_name = string
+    name               = string
+    subnet_id          = string
+    public_ip          = bool
+    key_name           = string
     security_group_ids = list(string)
   }))
   default = null
@@ -38,14 +38,14 @@ variable "ec2_instances" {
 
 variable "launch_template" {
   type = object({
-    name      = string
+    name = string
     # subnet_ids   = list(string)
     # public_ip = bool
     # key_name = string
     security_group_ids = list(string)
-    min_size            = number
-    max_size            = number
-    desired_capacity    = number
+    min_size           = number
+    max_size           = number
+    desired_capacity   = number
   })
   default = null
 }

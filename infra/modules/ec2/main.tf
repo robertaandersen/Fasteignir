@@ -95,7 +95,7 @@ resource "aws_autoscaling_group" "asg" {
 
   tag {
     key                 = "Name"
-    value               = "app-instance"
+    value               = "autoscaled-instance"
     propagate_at_launch = true
   }
 }

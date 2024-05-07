@@ -1,4 +1,4 @@
-data aws_security_group allow_http {
+data "aws_security_group" "allow_http" {
   name = "Allow HTTP"
 }
 
