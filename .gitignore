@@ -16,6 +16,15 @@ obj/
 # production
 **//build
 
+# build folders
+**/build/
+
+**//kaupskra.csv
+**/*/kaupskra.csv
+**kaupskra.csv
+
+./HmsSync/kaupskra.csv
+
 # misc
 **/.DS_Store
 **/.env.local

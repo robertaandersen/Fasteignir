@@ -1,6 +1,7 @@
 
 using FasteignirApi.Data;
 using FasteignirCommon.EF;
+using Microsoft.EntityFrameworkCore;
 
 namespace FasteignirApi.Services
 {
@@ -37,7 +38,8 @@ namespace FasteignirApi.Services
             if (thinglystTil != null) baseQuery = baseQuery?.Where(x => x.Thinglystdags <= thinglystTil);
             if (byggingarFra != null) baseQuery = baseQuery?.Where(x => x.Byggar >= byggingarFra);
             if (byggingarTil != null) baseQuery = baseQuery?.Where(x => x.Byggar <= byggingarTil);
-            return baseQuery?.ToList() ?? new();
+            var x = baseQuery.ToQueryString();
+            return baseQuery?.Take(100).OrderByDescending(x => x.Utgdag).ToList() ?? new();
         }
     }
 }

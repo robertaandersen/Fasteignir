@@ -26,19 +26,26 @@ namespace FasteignirApi.Controllers
             DateTime? thinglystTil,
             int? byggingarFra,
             int? byggingarTil)
-                 => Ok(kaupskraService.FetchKaupskra(
-                    SanitizeString(name),
-                    SanitizeString(postNumer)?.Split(",").Select(x => int.Parse(x)).ToList(),
-                    fermetrarFra,
-                    fermetrarTil,
-                    kaupverdFra,
-                    kaupverdTil,
-                    herbergiFra,
-                    herbergiTil,
-                    thinglystFra,
-                    thinglystTil,
-                    byggingarFra,
-                    byggingarTil).ToList());
+        {
+            if (string.IsNullOrEmpty(name) &&
+                string.IsNullOrEmpty(postNumer) &&
+                fermetrarFra == null &&
+                fermetrarTil == null &&
+                kaupverdFra == null &&
+                kaupverdTil == null &&
+                herbergiFra == null &&
+                herbergiTil == null &&
+                thinglystFra == null &&
+                thinglystTil == null &&
+                byggingarFra == null &&
+                byggingarTil == null)
+            {
+                return new List<Kaupskra>();
+            }
+            var res = kaupskraService.FetchKaupskra(SanitizeString(name), SanitizeString(postNumer)?.Split(",").Select(x => int.Parse(x.Trim())).ToList(), fermetrarFra, fermetrarTil, kaupverdFra, kaupverdTil, herbergiFra, herbergiTil, thinglystFra, thinglystTil, byggingarFra, byggingarTil).ToList();
+            return Ok(res);
+        }
+
 
         private static string? SanitizeString(string? stringVal) => stringVal?.Trim();
     }
