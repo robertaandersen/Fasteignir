@@ -2,6 +2,13 @@ data "aws_security_group" "allow_db_sg" {
   name = "Allow DB"
 }
 
+resource "aws_ssm_parameter" "db_password" {
+  name        = "/production/database/password/master"
+  description = "The parameter description"
+  type        = "SecureString"
+  value       = "Hallo"
+}
+
 module "rds" {
   source             = "../../modules/rds"
   db_name            = "fasteignir"
