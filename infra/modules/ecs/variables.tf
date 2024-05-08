@@ -30,6 +30,7 @@ variable "task_settings" {
       image    = string
       port     = number
       hostPort = number
+      db_password_secret_arn = string
     })
   })
   description = "The settings for the ECS task"

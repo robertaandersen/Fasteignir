@@ -42,8 +42,12 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
           hostPort      = var.task_settings.container.hostPort,
           protocol      = "tcp"
           appProtocol   = "http"
-        }
-      ]
+        }]
+        environment: [{"name": "TEST_ENV", "value": "Environment"}],
+        secrets: [{
+        "name": "POSTGRES_PASSWORD",
+        "valueFrom": var.task_settings.container.db_password_secret_arn
+    }]
     }
   ])
 }

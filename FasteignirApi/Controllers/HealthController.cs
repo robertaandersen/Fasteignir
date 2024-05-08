@@ -9,7 +9,7 @@ namespace FasteignirApi.Controllers
     public class HealthController : ControllerBase
     {
         [HttpGet]
-        public ActionResult<List<Kaupskra>> Get() => Ok("Hello World");
+        public ActionResult<List<Kaupskra>> Get() => Ok($"Hello World {Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "i´m a teapot"}");
 
     }
 }
