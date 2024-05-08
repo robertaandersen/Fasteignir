@@ -42,8 +42,13 @@ data "aws_security_group" "allow_http" {
 # }
 
 data "aws_ssm_parameter" "db_password" {
-  name = "/production/database/password/master"
-
+  name = "/production/database/password"
+}
+data "aws_ssm_parameter" "db_username" {
+  name = "/production/database/user"
+}
+data "aws_ssm_parameter" "db_host" {
+  name = "/production/database/host"
 }
 
 
@@ -101,7 +106,9 @@ module "frontend-cluster" {
       # image    = "nginx:latest"
       port     = 8080
       hostPort = 8080
-      db_password_secret_arn = data.aws_ssm_parameter.db_password.arn
+      db_password_arn = data.aws_ssm_parameter.db_password.arn
+      db_user_arn = data.aws_ssm_parameter.db_username.arn
+      db_host_arn = data.aws_ssm_parameter.db_host.arn
     }
   }
 }

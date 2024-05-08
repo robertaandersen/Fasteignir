@@ -3,10 +3,22 @@ data "aws_security_group" "allow_db_sg" {
 }
 
 resource "aws_ssm_parameter" "db_password" {
-  name        = "/production/database/password/master"
-  description = "The parameter description"
+  name        = "/production/database/password"
+  description = "password"
   type        = "SecureString"
+  value       = var.password
+}
+resource "aws_ssm_parameter" "db_username" {
+  name        = "/production/database/user"
+  description = "The dbuser name"
+  type        = "SecureString"
+  value       = var.username
+}
+resource "aws_ssm_parameter" "db_host" {
+  name        = "/production/database/host"
+  description = "The db endpoint"
   value       = "Hallo"
+  type = "String"
 }
 
 
