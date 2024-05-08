@@ -9,6 +9,7 @@ resource "aws_ssm_parameter" "db_password" {
   value       = "Hallo"
 }
 
+
 module "rds" {
   source             = "../../modules/rds"
   db_name            = "fasteignir"

@@ -52,13 +52,13 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   ])
 }
 
-
 resource "aws_ecs_service" "service" {
   name            = "${var.cluster_name}-service"
   cluster         = aws_ecs_cluster.cluster.id
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count   = var.task_settings.desired_count
   launch_type     = "FARGATE"
+
   network_configuration {
     subnets          = var.subnet_ids
     security_groups  = var.security_group_ids

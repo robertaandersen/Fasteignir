@@ -1,5 +1,6 @@
 
 
+data "aws_caller_identity" "current" {}
 locals {
   create_ec2 = false
   ecs2_in_each_subnet = [for subnet in var.subnet_ids : {
@@ -42,7 +43,46 @@ data "aws_security_group" "allow_http" {
 
 data "aws_ssm_parameter" "db_password" {
   name = "/production/database/password/master"
+
 }
+
+
+
+
+resource "aws_iam_policy" "database_secrets" {
+  name        = "read-db-secrets"
+  path        = "/"
+  description = "IAM policy for fetching secrets for databases"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:DescribeParameters",
+        "ssm:GetParametersByPath"
+      ],
+      "Resource": "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/production/database/*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+data "aws_iam_role" "ecsTaskExecutionRole" {
+  name = "ecsTaskExecutionRole"
+}
+resource "aws_iam_role_policy_attachment" "db_write_get_db_secrets" {
+  role       = data.aws_iam_role.ecsTaskExecutionRole.name
+  policy_arn = aws_iam_policy.database_secrets.arn
+}
+
+
+
 module "frontend-cluster" {
   source             = "../../modules/ecs"
   cluster_name       = "frontend-cluster"
