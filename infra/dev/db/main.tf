@@ -17,7 +17,7 @@ resource "aws_ssm_parameter" "db_username" {
 resource "aws_ssm_parameter" "db_host" {
   name        = "/production/database/host"
   description = "The db endpoint"
-  value       = "Hallo"
+  value       = module.rds.endpoint
   type = "String"
 }
 

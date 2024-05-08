@@ -30,6 +30,3 @@ resource "aws_db_instance" "db" {
   }
 }
 
-output "debug" {
-  value = "var.test"
-}
