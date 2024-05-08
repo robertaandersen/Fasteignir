@@ -75,3 +75,4 @@ resource "aws_route_table_association" "public_subnet_associations" {
   subnet_id      = aws_route_table.public_route_tables[count.index].tags["subnet_id"]
   route_table_id = aws_route_table.public_route_tables[count.index].id
 }
+

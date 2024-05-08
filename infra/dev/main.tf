@@ -6,6 +6,15 @@ terraform {
     encrypt = true
   }
 }
+
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+variable "db_username" {
+  type      = string
+  sensitive = true
+}
 locals {
   region      = "eu-west-1"
   jumpbox_key = "jumpbox-key"
@@ -49,13 +58,14 @@ resource "aws_ecr_repository" "ecr" {
 }
 
 
+module "db" {
+  source        = "./db"
+  password      = var.db_password
+  username      = var.db_username
+  db_subnet_ids = module.networking.rds_subnets.*.id
 
-# resource "aws_ecs_task_definition" "ecs_task_definition" {
-#   family = "temp"
-#   container_definitions = null
-# }
+}
 
-# import {
-#   to = aws_ecs_task_definition.ecs_task_definition
-#   id = "arn:aws:ecs:eu-west-1:992382615085:task-definition/temp"
-# }
+output "name" {
+  value = module.db
+}

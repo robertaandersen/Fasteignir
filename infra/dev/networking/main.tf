@@ -62,6 +62,27 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
+resource "aws_security_group" "allow_db_sg" {
+  name        = "Allow DB"
+  description = "Allow DB inbound traffic"
+  vpc_id      = module.vpc.vpc_id
+  ingress {
+    description = "DB from Web"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}
+
 resource "aws_security_group" "allow_ssh_sg" {
   name        = "Allow ssh"
   description = "Allow SSH inbound traffic"
