@@ -25,7 +25,7 @@ var hostName = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost
 var userName = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "admin";
 var password = Environment.GetEnvironmentVariable("POSTGRES_PASS") ?? "admin";
 var connectionString = $"Host={hostName};Username={userName};Password={password};Database=fasteignir";
-builder.Services.AddDbContext<FasteignaskraContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("db")));
+builder.Services.AddDbContext<FasteignaskraContext>(options => options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
