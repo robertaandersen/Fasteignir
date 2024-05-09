@@ -7,8 +7,8 @@ import "react-tabulator/lib/css/tabulator.min.css"; // theme
 import { ApiConfig, Kaupskra, columns } from "./CustomTypes";
 
 let apiConfig: ApiConfig = {
-  // host: "http://external-alb-1426860325.eu-west-1.elb.amazonaws.com",
-  host: "http://localhost:5063",
+  host: "http://external-alb-1426860325.eu-west-1.elb.amazonaws.com:8080",
+  // host: "http://localhost:5063",
   api: "api",
   service: "Kaupskra",
 };

@@ -4,6 +4,11 @@
 **/out
 **/node_modules
 
-
-
 DockerInfra/
+
+node_modules
+build
+.dockerignore
+Dockerfile
+.git
+.gitignore

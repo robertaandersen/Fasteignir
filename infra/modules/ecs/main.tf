@@ -2,11 +2,6 @@ data "aws_caller_identity" "current" {}
 resource "aws_ecs_cluster" "cluster" {
   name = var.cluster_name
 }
-
-data "aws_lb_target_group" "target_group_ip" {
-  name = "${var.alb_name}-ip-tg"
-}
-
 resource "aws_ecs_cluster_capacity_providers" "capacity_provider" {
   cluster_name = aws_ecs_cluster.cluster.name
 
@@ -48,7 +43,6 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
           {"name": "POSTGRES_PASSWORD","valueFrom": var.task_settings.container.db_password_arn},
           {"name": "POSTGRES_USER","valueFrom": var.task_settings.container.db_user_arn},
           {"name": "POSTGRES_HOST","valueFrom": var.task_settings.container.db_host_arn},
-
         ]}
   ])
 }
@@ -67,8 +61,8 @@ resource "aws_ecs_service" "service" {
   }
 
   load_balancer {
-    target_group_arn = data.aws_lb_target_group.target_group_ip.arn
+    target_group_arn = var.target_group_arn
     container_name   = var.task_settings.container.name
-    container_port   = 8080
+    container_port   = var.load_balancer_container_port
   }
 }

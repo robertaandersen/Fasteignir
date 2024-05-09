@@ -67,11 +67,17 @@ resource "aws_security_group" "allow_db_sg" {
   description = "Allow DB inbound traffic"
   vpc_id      = module.vpc.vpc_id
   ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.16.1.0/24"]
+  }
+  ingress {
     description = "DB from Web"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["89.17.152.11/32"]
   }
 
   egress {

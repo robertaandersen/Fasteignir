@@ -87,13 +87,17 @@ resource "aws_iam_role_policy_attachment" "db_write_get_db_secrets" {
 }
 
 
-
+data "aws_lb_target_group" "target_group_ip" {
+  name = "${var.alb_name}-ip-tg"
+}
 module "frontend-cluster" {
   source             = "../../modules/ecs"
   cluster_name       = "frontend-cluster"
   subnet_ids         = var.subnet_ids
   security_group_ids = [data.aws_security_group.allow_http.id]
   alb_name           = var.alb_name
+  load_balancer_container_port = 8080
+  target_group_arn = data.aws_lb_target_group.target_group_ip.arn
   task_settings = {
     network_mode     = "awsvpc"
     cpu              = 1024
@@ -114,6 +118,36 @@ module "frontend-cluster" {
 }
 
 
+data "aws_lb_target_group" "target_group_ip_80" {
+  name = "${var.alb_name}-ip-80-tg"
+}
+
+module "web-cluster" {
+  source             = "../../modules/ecs"
+  cluster_name       = "web-cluster"
+  subnet_ids         = var.subnet_ids
+  security_group_ids = [data.aws_security_group.allow_http.id]
+  alb_name           = var.alb_name
+  load_balancer_container_port = 80
+  target_group_arn = data.aws_lb_target_group.target_group_ip_80.arn
+  task_settings = {
+    network_mode     = "awsvpc"
+    cpu              = 1024
+    memory           = 3072
+    desired_count    = 1
+    assign_public_ip = true
+    container = {
+      name  = "fasteignir"
+      image = "992382615085.dkr.ecr.eu-west-1.amazonaws.com/fasteignir-web:latest"
+      # image    = "nginx:latest"
+      port     = 80
+      hostPort = 80
+      db_password_arn = data.aws_ssm_parameter.db_password.arn
+      db_user_arn = data.aws_ssm_parameter.db_username.arn
+      db_host_arn = data.aws_ssm_parameter.db_host.arn
+    }
+  }
+}
 
 
 # resource "tls_private_key" "ec2_key_pair" {

@@ -16,8 +16,16 @@ variable "alb_name" {
   type        = string
   description = "Name of alb"
 }
+variable "load_balancer_container_port" {
+  type        = number
+  description = "Name of alb"
+}
 
+variable "target_group_arn" {
+  type        = string
+  description = "The ARN of the target group"
 
+}
 variable "task_settings" {
   type = object({
     cpu              = number
