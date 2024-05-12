@@ -100,8 +100,8 @@ module "frontend-cluster" {
   target_group_arn = data.aws_lb_target_group.target_group_ip.arn
   task_settings = {
     network_mode     = "awsvpc"
-    cpu              = 1024
-    memory           = 3072
+    cpu              = 256
+    memory           = 512
     desired_count    = 1
     assign_public_ip = true
     container = {
@@ -132,8 +132,8 @@ module "web-cluster" {
   target_group_arn = data.aws_lb_target_group.target_group_ip_80.arn
   task_settings = {
     network_mode     = "awsvpc"
-    cpu              = 1024
-    memory           = 3072
+    cpu              = 256
+    memory           = 512
     desired_count    = 1
     assign_public_ip = true
     container = {
